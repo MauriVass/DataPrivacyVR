@@ -5,20 +5,24 @@ using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
-	  public GameObject camera, feedback, player,GOcamera;
-		public bool Feedback;
+	  public GameObject camera, player;
 
 		float timeTouch, velocity=4f, threshold = 0.4f;
 		public float force;
-		bool touched = false, haveMagnifier = true, collectedText;
+		bool touched = false, haveMagnifier, collectedText;
 		Vector3 pos,vel;
 		public Text[] testi;
 		public GameObject[] image;
+
+		public UnityStandardAssets.Characters.FirstPerson.FirstPersonController fpc;
+
+		public bool playerMoving;
 
 		RaycastHit hit;
     // Start is called before the first frame update
     void Start()
     {
+			  haveMagnifier = false;
 				pos = player.transform.position;
 				Cursor.visible=false;
     }
@@ -40,17 +44,24 @@ public class PlayerScript : MonoBehaviour
 						}
 						if (touch.phase == TouchPhase.Stationary)
 						{
-							//timeTouch+=Time.deltaTime;
+							timeTouch+=Time.deltaTime;
+							if (timeTouch>1) {
+								fpc.canMove = true;
+							}
+
 							testi[0].text = "Stationary";
 							testi[1].text = "Stationary";
 						}
 						if (touch.phase == TouchPhase.Ended)
 						{
+							fpc.canMove = false;
+
 							timeTouch = 0;
 							testi[0].text = "Ended";
 							testi[1].text = "Ended";
 						}
 
+/*
 						if ( (timeTouch > threshold) || (touch.phase == TouchPhase.Stationary) ) {
 							//pos.x+=GOcamera.transform.forward.x*velocity*Time.deltaTime;
 							//pos.y+=GOcamera.transform.forward.y*velocity*Time.deltaTime;
@@ -73,44 +84,26 @@ public class PlayerScript : MonoBehaviour
 						//pos=pos+vel;
 			}else{
 				player.GetComponent<Rigidbody>().velocity=Vector3.zero;
+*/
 			}
 
 
 ///*
-			//To Delete
-			if (Input.GetKey(KeyCode.V)) {
-				force = 500;
-			}
-
-			if (Input.GetKey(KeyCode.Space)) {
-
 						if (Input.GetKey(KeyCode.W)) {
-							timeTouch+=Time.deltaTime;
+							fpc.canMove = true;
 						}else{
-							timeTouch=0;
+							fpc.canMove = false;
 						}
-						if (timeTouch > threshold) {
-							//pos.x+=GOcamera.transform.forward.x*velocity*Time.deltaTime;
-							//pos.y+=GOcamera.transform.forward.y*velocity*Time.deltaTime;
-							//pos.z+=GOcamera.transform.forward.z*velocity*Time.deltaTime;
-							//player.transform.position=pos;
-							vel = GOcamera.transform.forward;
-							player.GetComponent<Rigidbody>().AddForce(vel*force);
-							timeTouch=threshold-0.001f;
+						if (Input.GetMouseButtonDown(1))
+						{
+							touched = true;
 						}
-						else{
-							 //thisPlayer.GetComponent<FirstPersonController>().canMove=false;
-							 //player.GetComponent<Rigidbody>().velocity=Vector3.zero;
-							 touched=true;
-						}
-			}
-			///
 //*/
 
-				Debug.DrawRay(GOcamera.transform.position,GOcamera.transform.forward*100,Color.green);
+				//Debug.DrawRay(GOcamera.transform.position,GOcamera.transform.forward*100,Color.green);
 				if (Input.GetMouseButtonDown(0)||touched)
 				{//camera.transform.TransformDirection(Vector3.forward)
-					if (Physics.Raycast(GOcamera.transform.position, GOcamera.transform.forward, out hit, Mathf.Infinity))
+					if (Physics.Raycast(camera.transform.position, camera.transform.forward, out hit, Mathf.Infinity))
 					{
 						Debug.Log("Did Hit :" + hit.collider.transform.tag);
 
@@ -137,24 +130,19 @@ public class PlayerScript : MonoBehaviour
 						}
 
 						if (hit.collider.transform.tag == "CryptedNumbers" && distance < dist) {
+								print("numbers");
 
-							print("numbers");
+								if (haveMagnifier) {
+									hit.collider.transform.gameObject.SetActive(false);
+									collectedText = true;
 
-							if (haveMagnifier) {
-								hit.collider.transform.gameObject.SetActive(false);
-								collectedText = true;
-
-								print("Collected");
-							}
-							else{
-								print("Need a Magnifier");
-							}
-
-							image[0].SetActive(true);
-							image[1].SetActive(true);
-
-							print("Collected Magnifier");
+									print("Collected");
+								}
+								else{
+									print("Need a Magnifier");
+								}
 						}
+						
 					}
 					else
 					{
@@ -166,8 +154,6 @@ public class PlayerScript : MonoBehaviour
 				}
 				else if (Physics.Raycast(camera.transform.position, camera.transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity))
 				{
-					if(Feedback)
-						feedback.transform.position = hit.point;
 				}
 
    }

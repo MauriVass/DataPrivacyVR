@@ -42,11 +42,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
         private AudioSource m_AudioSource;
 
+
+        public GameObject cam;
+
         // Use this for initialization
         private void Start()
         {
             m_CharacterController = GetComponent<CharacterController>();
+
             m_Camera = Camera.main;
+
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, m_StepInterval);
@@ -200,12 +205,38 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Camera.transform.localPosition = newCameraPosition;
         }
 
-
+        Vector2 angGO, angCam;
+        float angle;
+        public bool canMove;
         private void GetInput(out float speed)
         {
             // Read input
-            float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
-            float vertical = CrossPlatformInputManager.GetAxis("Vertical");
+
+            //horizontal Right-Left Movement
+            //Vertical Up-Down Movement
+            float horizontal =0;// = CrossPlatformInputManager.GetAxis("Horizontal");
+            float vertical = 0;// = CrossPlatformInputManager.GetAxis("Vertical");
+
+            Debug.DrawRay(transform.position,cam.transform.forward*100,Color.red);
+            Debug.DrawRay(transform.position,transform.forward*100,Color.green);
+
+            angGO = new Vector2(transform.forward.x,transform.forward.z);
+            angCam = new Vector2(cam.transform.forward.x,cam.transform.forward.z);
+
+            angle = Vector2.SignedAngle(angGO,angCam);
+
+            if (Input.GetKey(KeyCode.B) || canMove) {
+              horizontal = - Mathf.Sin(angle * Mathf.PI / 180f);
+              vertical = Mathf.Cos(angle * Mathf.PI / 180f);
+
+              //print("Angle: " + angle + " ( Horizontal: " + horizontal + " Sin: " + Mathf.Sin(angle) + " ) " + " ( Vertical: " + vertical + " Cos: " + Mathf.Cos(angle) + " ) ");
+            }
+            else{
+              horizontal = 0;
+              vertical = 0;
+            }
+
+
 
             bool waswalking = m_IsWalking;
 

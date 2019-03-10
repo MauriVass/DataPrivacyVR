@@ -20,46 +20,49 @@ public class LevelGenerator : MonoBehaviour
     public float offset;
     float sizeZ;
 
+    void CreateLevel(){
+        allServer = new List<GameObject>();
+
+        for (int i=0; i<server.Length; i++) {
+
+              X = server[i].transform.position.x;
+              Y = server[i].transform.position.y;
+              sizeZ = server[i].GetComponent<BoxCollider>().size.z*server[i].transform.localScale.z;
+
+              float lastZ = server[i].transform.position.z;
+              float newZ = 0;
+
+              // Questo ciclo eseguirà il pezzo di codice fra {} un numero di volte pari a nPlane
+              for (int j = 0; j < nCabinet; j++)
+              {
+                  // Generiamo un nuovo piano con le caratteristiche del prefab che abbiamo assegnato in Editor
+                  GameObject newPlane = Instantiate(server[i]);
+                  newPlane.transform.name = "Server " + (i+j);
+                  allServer.Add(newPlane);
+
+                  newZ = lastZ - (sizeZ + offset) * forward[i];
+
+                  // Assegniamo al nuovo server la posizione che abbiamo calcolato.
+                  newPlane.transform.position = new Vector3(X, Y, newZ);
+
+                  lastZ = newZ;
+              }
+      }
+    }
+
     void Start()
     {
-      allServer = new List<GameObject>();
-
-      for (int i=0; i<server.Length; i++) {
-
-            X = server[i].transform.position.x;
-            Y = server[i].transform.position.y;
-            sizeZ = server[i].GetComponent<BoxCollider>().size.z*server[i].transform.localScale.z;
-
-            float lastZ = server[i].transform.position.z;
-            float newZ = 0;
-
-            // Questo ciclo eseguirà il pezzo di codice fra {} un numero di volte pari a nPlane
-            for (int j = 0; j < nCabinet; j++)
-            {
-                // Generiamo un nuovo piano con le caratteristiche del prefab che abbiamo assegnato in Editor
-                GameObject newPlane = Instantiate(server[i]);
-                newPlane.transform.name = "Server " + (i+j);
-                allServer.Add(newPlane);
-
-                newZ = lastZ - (sizeZ + offset) * forward[i];
-
-                // Assegniamo al nuovo server la posizione che abbiamo calcolato.
-                newPlane.transform.position = new Vector3(X, Y, newZ);
-
-                lastZ = newZ;
-            }
-            //wantedMode = CursorLockMode.Confined;
-      }
-
+      //server = GameObject.FindGameObjectsWithTag("Server");
       /*
       for (int i=0; i<allServer.Count; i++) {
         GameObject g = allServer[i];
         print(g.transform.name);
       }
       */
-      int ran = Random.Range(1,allServer.Count);
-      allServer[ran].transform.GetChild(1).gameObject.SetActive(true);
-      print(ran);
+      ///int ran = Random.Range(1,server.Count);
+      //allServer[ran].transform.GetChild(1).gameObject.SetActive(true);
+    //  allServer[ran].transform.GetChild(0).gameObject.SetActive(false);
+      //print(ran);
     }
 
 
